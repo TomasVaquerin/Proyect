@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Dashboard</title>
+</head>
+<body>
+
+<h1 id="token-h1"></h1>
+
+<script>
+    // Obtiene el token de la URL (?token=...)
+    const params = new URLSearchParams(window.location.search);
+    const token = params.get('token');
+    document.getElementById('token-h1').textContent = token ? token : 'No hay token';
+</script>
+
+</body>
+</html>

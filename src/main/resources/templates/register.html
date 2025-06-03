@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro de usuario</title>
+</head>
+<body>
+<h1>Completa tu registro</h1>
+<form id="registerForm">
+    <label>Nombre:
+        <input type="text" name="nombre" id="nombre" required>
+    </label><br>
+    <label>Apellidos:
+        <input type="text" name="apellidos" id="apellidos" required>
+    </label><br>
+    <label>Email:
+        <input type="email" name="email" id="email" required readonly>
+    </label><br>
+    <label>Foto de perfil (URL):
+        <input type="text" name="fotoPerfil" id="fotoPerfil">
+    </label><br>
+    <label>Fecha de nacimiento:
+        <input type="date" name="fechaNacimiento" id="fechaNacimiento">
+    </label><br>
+    <button type="submit">Registrar</button>
+</form>
+
+<script>
+    // Rellena los campos con los datos del usuario autenticado (puedes obtenerlos de un endpoint como /api/hello o /api/user/me)
+    fetch('/api/hello')
+        .then(res => res.json())
+        .then(data => {
+            document.getElementById('nombre').value = data.nombre || '';
+            document.getElementById('apellidos').value = data.apellidos || '';
+            document.getElementById('email').value = data.email || '';
+            document.getElementById('fotoPerfil').value = data.fotoPerfil || '';
+        });
+
+    document.getElementById('registerForm').addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = {
+            nombre: document.getElementById('nombre').value,
+            apellidos: document.getElementById('apellidos').value,
+            email: document.getElementById('email').value,
+            fotoPerfil: document.getElementById('fotoPerfil').value,
+            fechaNacimiento: document.getElementById('fechaNacimiento').value || null
+        };
+        fetch('/api/users', {
+            method: 'POST',
+            headers: {'Content-Type': 'application/json'},
+            body: JSON.stringify(formData)
+        })
+            .then(res => {
+                if (res.ok) {
+                    window.location.href = '/dashboard';
+                } else {
+                    alert('Error al registrar usuario');
+                }
+            });
+    });
+</script>
+</body>
+</html>

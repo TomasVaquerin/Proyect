@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - "8080:8080"
+    restart: always
+    depends_on:
+      - postgres
+      - redis
+    env_file: .env
+    networks:
+      - tfg-network
+
+  postgres:
+    image: postgres:16
+    container_name: postgres-tfg
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    networks:
+      - tfg-network
+
+  redis:
+    image: redis:7
+    container_name: redis-tfg
+    restart: unless-stopped
+    ports:
+      - "6379:6379"
+    networks:
+      - tfg-network
+
+volumes:
+  pgdata:
+
+networks:
+  tfg-network:

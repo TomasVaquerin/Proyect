@@ -8,6 +8,8 @@ import dev.tomas.tfg.rest.calendario.model.Calendario;
 import dev.tomas.tfg.rest.calendario.repository.CalendarioRepository;
 import dev.tomas.tfg.rest.grupo.dto.GrupoRequestDto;
 import dev.tomas.tfg.rest.grupo.dto.GrupoResponseDto;
+import dev.tomas.tfg.rest.grupo.dto.GrupoUpdateDto;
+import dev.tomas.tfg.rest.grupo.exceptions.GrupoNotFoundException;
 import dev.tomas.tfg.rest.grupo.mapper.GrupoMapper;
 import dev.tomas.tfg.rest.grupo.model.Grupo;
 import dev.tomas.tfg.rest.grupo.notifications.GrupoNotification;
@@ -32,11 +34,15 @@ public class GrupoServiceImpl implements GrupoService {
     private final GrupoNotification grupoNotification;
     private final CalendarioRepository calendarioRepository;
 
-    public GrupoServiceImpl(GrupoRepository grupoRepository,
-                            GrupoMapper grupoMapper,
-                            GrupoValidator grupoValidator,
-                            UserValidator userValidator,
-                            GrupoHelper grupoHelper, GrupoNotification grupoNotification, CalendarioRepository calendarioRepository) {
+    public GrupoServiceImpl(
+            GrupoRepository grupoRepository,
+            GrupoMapper grupoMapper,
+            GrupoValidator grupoValidator,
+            UserValidator userValidator,
+            GrupoHelper grupoHelper,
+            GrupoNotification grupoNotification,
+            CalendarioRepository calendarioRepository
+    ) {
         this.grupoRepository = grupoRepository;
         this.grupoMapper = grupoMapper;
         this.grupoValidator = grupoValidator;
@@ -61,22 +67,39 @@ public class GrupoServiceImpl implements GrupoService {
     @Override
     public Grupo getById(UUID id) {
         return grupoRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Grupo no encontrado"));
+                .orElseThrow(() -> new GrupoNotFoundException(id));
     }
 
     @Override
     public GrupoResponseDto crearGrupo(GrupoRequestDto dto, UUID creadorId) {
         User creador = userValidator.validateUserExists(creadorId);
-        Set<User> miembros = new HashSet<>();
-        miembros.add(creador);
-        Grupo grupo = grupoMapper.toEntity(dto.nombre(), creador, miembros);
+
+        Grupo grupo = grupoMapper.toEntity(dto.nombre(), creador);
         Grupo grupoGuardado = grupoRepository.save(grupo);
+
+        grupoGuardado.getUsuarios().add(creador);
+        grupoRepository.save(grupoGuardado);
+
         CalendarioResponseDto calendario = getCalendarioDeGrupo(grupoGuardado.getId());
         GrupoResponseDto response = GrupoMapper.toDto(grupoGuardado, calendario);
         grupoNotification.notifyGrupoCreado(response);
         return response;
     }
 
+    @Override
+    @Transactional
+    public GrupoResponseDto updateGrupo(UUID grupoId, GrupoUpdateDto dto, UUID userId) {
+        Grupo grupo = grupoValidator.validateGrupoExists(grupoId);
+        userValidator.validateUserExists(userId);
+        grupoValidator.validateIsCreator(grupo, userId);
+
+        grupo.setNombre(dto.nombre());
+        grupo.setDescription(dto.descripcion());
+        grupoRepository.save(grupo);
+
+        CalendarioResponseDto calendario = getCalendarioDeGrupo(grupo.getId());
+        return GrupoMapper.toDto(grupo, calendario);
+    }
 
     @Override
     @Transactional

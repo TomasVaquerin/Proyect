@@ -12,7 +12,6 @@
 <h1 id="token-h1"></h1>
 
 <script>
-    // Obtiene el token de la URL (?token=...)
     const params = new URLSearchParams(window.location.search);
     const token = params.get('token');
     document.getElementById('token-h1').textContent = token ? token : 'No hay token';

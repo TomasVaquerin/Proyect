@@ -7,7 +7,7 @@ import dev.tomas.tfg.rest.user.mapper.UserMapper;
 import dev.tomas.tfg.rest.user.model.User;
 import dev.tomas.tfg.rest.user.repository.UserRepository;
 import dev.tomas.tfg.rest.user.validator.UserValidator;
-import dev.tomas.tfg.storage.service.FileStorageService;
+import dev.tomas.tfg.rest.storage.service.FileStorageService;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -76,13 +76,10 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public String guardarFoto(UUID userId, MultipartFile file) {
-        User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
-
+        User user = userValidator.validateUserExists(userId);
         String fotoUrl = fileStorageService.guardarArchivo(file);
         user.setFotoPerfil(fotoUrl);
         userRepository.save(user);
-
         return fotoUrl;
     }
 }

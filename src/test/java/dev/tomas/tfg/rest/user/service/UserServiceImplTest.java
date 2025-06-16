@@ -6,7 +6,7 @@ import dev.tomas.tfg.rest.user.dto.UserResponseDto;
 import dev.tomas.tfg.rest.user.mapper.UserMapper;
 import dev.tomas.tfg.rest.user.model.User;
 import dev.tomas.tfg.rest.user.repository.UserRepository;
-import dev.tomas.tfg.storage.service.FileStorageService;
+import dev.tomas.tfg.rest.storage.service.FileStorageService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.*;

@@ -50,7 +50,6 @@ public class CalendarioController {
         return ResponseEntity.ok(response);
     }
 
-    // src/main/java/dev/tomas/tfg/rest/calendario/controller/CalendarioController.java
     @PutMapping("/update")
     public ResponseEntity<CalendarioResponseDto> update(
             @RequestBody CalendarioRequestDto dto,

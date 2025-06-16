@@ -6,13 +6,11 @@ import dev.tomas.tfg.rest.comentarios.model.Comentario;
 import dev.tomas.tfg.rest.eventos.model.Event;
 import dev.tomas.tfg.rest.user.model.User;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.UUID;
 
 public class ComentarioMapper {
 
-    // ComentarioMapper.java
     public static Comentario toEntity(ComentarioRequestDto dto, Event evento, User autor) {
         Comentario comentario = new Comentario();
         comentario.setId(UUID.randomUUID());

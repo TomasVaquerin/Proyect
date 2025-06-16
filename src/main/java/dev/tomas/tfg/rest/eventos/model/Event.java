@@ -1,6 +1,5 @@
 package dev.tomas.tfg.rest.eventos.model;
 
-import dev.tomas.tfg.rest.calendario.model.Calendario;
 import dev.tomas.tfg.rest.comentarios.model.Comentario;
 import dev.tomas.tfg.rest.grupo.model.Grupo;
 import dev.tomas.tfg.rest.user.model.User;

@@ -19,7 +19,7 @@ public class Grupo {
 
     private String nombre;
 
-    private String descripciton;
+    private String description;
 
     @ManyToOne
     @JoinColumn(name = "creador_id", nullable = false)
@@ -32,5 +32,6 @@ public class Grupo {
             inverseJoinColumns = @JoinColumn(name = "user_id")
     )
     private Set<User> usuarios = new HashSet<>();
+
 }
 

@@ -1,7 +1,6 @@
 package dev.tomas.tfg.rest.calendario.model;
 
 import dev.tomas.tfg.rest.user.model.User;
-import dev.tomas.tfg.rest.grupo.model.Grupo;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;

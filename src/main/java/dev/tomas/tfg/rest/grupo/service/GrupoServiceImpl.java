@@ -23,6 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
+/**
+ * Implementación del servicio para gestionar grupos.
+ * Proporciona métodos para realizar operaciones CRUD sobre grupos y gestionar la participación de usuarios.
+ */
 @Service
 public class GrupoServiceImpl implements GrupoService {
 
@@ -34,6 +38,17 @@ public class GrupoServiceImpl implements GrupoService {
     private final GrupoNotification grupoNotification;
     private final CalendarioRepository calendarioRepository;
 
+    /**
+     * Constructor para inyectar las dependencias necesarias.
+     *
+     * @param grupoRepository Repositorio para gestionar grupos.
+     * @param grupoMapper Mapper para convertir entre entidades y DTOs de grupos.
+     * @param grupoValidator Validador para verificar reglas de negocio de los grupos.
+     * @param userValidator Validador para verificar reglas de negocio de los usuarios.
+     * @param grupoHelper Helper para operaciones auxiliares relacionadas con grupos.
+     * @param grupoNotification Notificaciones relacionadas con grupos.
+     * @param calendarioRepository Repositorio para gestionar calendarios.
+     */
     public GrupoServiceImpl(
             GrupoRepository grupoRepository,
             GrupoMapper grupoMapper,
@@ -52,6 +67,11 @@ public class GrupoServiceImpl implements GrupoService {
         this.calendarioRepository = calendarioRepository;
     }
 
+    /**
+     * Obtiene todos los grupos.
+     *
+     * @return Lista de grupos en formato DTO.
+     */
     @Override
     public List<GrupoResponseDto> findAll() {
         return grupoRepository.findAll()
@@ -63,13 +83,26 @@ public class GrupoServiceImpl implements GrupoService {
                 .toList();
     }
 
-
+    /**
+     * Obtiene un grupo por su ID.
+     *
+     * @param id ID del grupo a buscar.
+     * @return El grupo encontrado.
+     * @throws GrupoNotFoundException Si el grupo no existe.
+     */
     @Override
     public Grupo getById(UUID id) {
         return grupoRepository.findById(id)
                 .orElseThrow(() -> new GrupoNotFoundException(id));
     }
 
+    /**
+     * Crea un nuevo grupo.
+     *
+     * @param dto Datos del grupo a crear.
+     * @param creadorId ID del usuario creador del grupo.
+     * @return El grupo creado en formato DTO.
+     */
     @Override
     public GrupoResponseDto crearGrupo(GrupoRequestDto dto, UUID creadorId) {
         User creador = userValidator.validateUserExists(creadorId);
@@ -86,6 +119,14 @@ public class GrupoServiceImpl implements GrupoService {
         return response;
     }
 
+    /**
+     * Actualiza un grupo existente.
+     *
+     * @param grupoId ID del grupo a actualizar.
+     * @param dto Datos actualizados del grupo.
+     * @param userId ID del usuario que realiza la actualización.
+     * @return El grupo actualizado en formato DTO.
+     */
     @Override
     @Transactional
     public GrupoResponseDto updateGrupo(UUID grupoId, GrupoUpdateDto dto, UUID userId) {
@@ -101,6 +142,12 @@ public class GrupoServiceImpl implements GrupoService {
         return GrupoMapper.toDto(grupo, calendario);
     }
 
+    /**
+     * Permite a un usuario unirse a un grupo.
+     *
+     * @param grupoId ID del grupo al que el usuario desea unirse.
+     * @param userId ID del usuario que desea unirse.
+     */
     @Override
     @Transactional
     public void unirseAGrupo(UUID grupoId, UUID userId) {
@@ -111,7 +158,12 @@ public class GrupoServiceImpl implements GrupoService {
         grupoRepository.save(grupo);
     }
 
-
+    /**
+     * Permite a un usuario salir de un grupo.
+     *
+     * @param grupoId ID del grupo del que el usuario desea salir.
+     * @param userId ID del usuario que desea salir.
+     */
     @Override
     @Transactional
     public void salirDeGrupo(UUID grupoId, UUID userId) {
@@ -123,6 +175,13 @@ public class GrupoServiceImpl implements GrupoService {
         grupoRepository.save(grupo);
     }
 
+    /**
+     * Expulsa a un usuario de un grupo.
+     *
+     * @param grupoId ID del grupo del que se desea expulsar al usuario.
+     * @param creadorId ID del creador del grupo.
+     * @param userIdAEliminar ID del usuario a expulsar.
+     */
     @Override
     @Transactional
     public void expulsarUsuario(UUID grupoId, UUID creadorId, UUID userIdAEliminar) {
@@ -134,6 +193,12 @@ public class GrupoServiceImpl implements GrupoService {
         grupoRepository.save(grupo);
     }
 
+    /**
+     * Obtiene el calendario asociado a un grupo.
+     *
+     * @param grupoId ID del grupo.
+     * @return El calendario del grupo en formato DTO.
+     */
     @Override
     public CalendarioResponseDto getCalendarioDeGrupo(UUID grupoId) {
         Grupo grupo = grupoValidator.validateGrupoExists(grupoId);

@@ -19,6 +19,10 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
+/**
+ * Implementación del servicio para gestionar comentarios.
+ * Proporciona métodos para obtener, crear y eliminar comentarios asociados a eventos.
+ */
 @Service
 public class ComentarioServiceImpl implements ComentarioService {
 
@@ -27,6 +31,14 @@ public class ComentarioServiceImpl implements ComentarioService {
     private final UserRepository userRepository;
     private final ComentarioValidator comentarioValidator;
 
+    /**
+     * Constructor para inyectar las dependencias necesarias.
+     *
+     * @param comentarioRepository Repositorio para gestionar comentarios.
+     * @param eventRepository Repositorio para gestionar eventos.
+     * @param userRepository Repositorio para gestionar usuarios.
+     * @param comentarioValidator Validador para verificar reglas de negocio de los comentarios.
+     */
     public ComentarioServiceImpl(ComentarioRepository comentarioRepository,
                                  EventRepository eventRepository,
                                  UserRepository userRepository,
@@ -37,6 +49,14 @@ public class ComentarioServiceImpl implements ComentarioService {
         this.comentarioValidator = comentarioValidator;
     }
 
+    /**
+     * Obtiene todos los comentarios asociados a un evento.
+     *
+     * @param eventoId ID del evento al que pertenecen los comentarios.
+     * @param usuario Usuario que realiza la solicitud.
+     * @return Lista de comentarios en formato DTO.
+     * @throws AccesoDenegadoComentarioException Si el usuario no pertenece al grupo del evento.
+     */
     @Override
     public List<ComentarioResponseDto> getAllComentariosDeEvento(UUID eventoId, User usuario) {
         Event evento = getEventoOrThrow(eventoId);
@@ -50,6 +70,13 @@ public class ComentarioServiceImpl implements ComentarioService {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Crea un nuevo comentario asociado a un evento.
+     *
+     * @param dto Datos del comentario a crear.
+     * @return El comentario creado en formato DTO.
+     * @throws AccesoDenegadoComentarioException Si el autor no pertenece al grupo del evento.
+     */
     @Override
     public ComentarioResponseDto crearComentario(ComentarioRequestDto dto) {
         Event evento = getEventoOrThrow(dto.eventoId());
@@ -65,6 +92,13 @@ public class ComentarioServiceImpl implements ComentarioService {
         return ComentarioMapper.toDto(comentario);
     }
 
+    /**
+     * Marca un comentario como eliminado.
+     *
+     * @param comentarioId ID del comentario a eliminar.
+     * @param solicitante Usuario que realiza la solicitud de eliminación.
+     * @throws AccesoDenegadoComentarioException Si el usuario no tiene permisos para eliminar el comentario.
+     */
     @Transactional
     public void borrarComentario(UUID comentarioId, User solicitante) {
         Comentario comentario = comentarioValidator.validateComentarioExists(comentarioId);
@@ -73,12 +107,25 @@ public class ComentarioServiceImpl implements ComentarioService {
         comentarioRepository.save(comentario);
     }
 
-
+    /**
+     * Obtiene un evento por su ID o lanza una excepción si no existe.
+     *
+     * @param eventoId ID del evento a buscar.
+     * @return El evento encontrado.
+     * @throws EventNotFoundException Si el evento no existe.
+     */
     Event getEventoOrThrow(UUID eventoId) {
         return eventRepository.findById(eventoId)
                 .orElseThrow(() -> new EventNotFoundException(eventoId));
     }
 
+    /**
+     * Obtiene un usuario por su ID o lanza una excepción si no existe.
+     *
+     * @param userId ID del usuario a buscar.
+     * @return El usuario encontrado.
+     * @throws IllegalArgumentException Si el usuario no existe.
+     */
     private User getUsuarioOrThrow(UUID userId) {
         return userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado: " + userId));

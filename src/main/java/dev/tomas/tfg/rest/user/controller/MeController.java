@@ -11,6 +11,10 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.util.UUID;
 
+/**
+ * Controlador REST para gestionar las operaciones relacionadas con el usuario autenticado.
+ * Proporciona endpoints para obtener información del usuario, actualizar su cuenta, subir una foto y eliminar la cuenta.
+ */
 @RestController
 @RequestMapping("/api/users/me")
 public class MeController {
@@ -18,17 +22,36 @@ public class MeController {
     private final UserService userService;
     private final JwtUtil jwtUtil;
 
+    /**
+     * Constructor para inyectar las dependencias necesarias.
+     *
+     * @param userService Servicio para gestionar usuarios.
+     * @param jwtUtil Utilidad para manejar JWT.
+     */
     public MeController(UserService userService, JwtUtil jwtUtil) {
         this.userService = userService;
         this.jwtUtil = jwtUtil;
     }
 
+    /**
+     * Obtiene la información del usuario autenticado.
+     *
+     * @param authHeader Cabecera de autorización con el token JWT.
+     * @return Información del usuario en formato DTO.
+     */
     @GetMapping
     public ResponseEntity<UserResponseDto> showMe(@RequestHeader("Authorization") String authHeader) {
         UserResponseDto user = jwtUtil.extractUser(authHeader);
         return ResponseEntity.ok(user);
     }
 
+    /**
+     * Actualiza la información de la cuenta del usuario autenticado.
+     *
+     * @param authHeader Cabecera de autorización con el token JWT.
+     * @param dto Datos actualizados del usuario.
+     * @return Información actualizada del usuario en formato DTO.
+     */
     @PutMapping
     public ResponseEntity<UserResponseDto> updateMyAccount(
             @RequestHeader("Authorization") String authHeader,
@@ -38,6 +61,13 @@ public class MeController {
         return ResponseEntity.ok(updated);
     }
 
+    /**
+     * Permite al usuario autenticado subir una foto de perfil.
+     *
+     * @param authHeader Cabecera de autorización con el token JWT.
+     * @param file Archivo de la foto a subir.
+     * @return URL de la foto subida.
+     */
     @PostMapping("/foto")
     public ResponseEntity<String> subirFoto(
             @RequestHeader("Authorization") String authHeader,
@@ -48,6 +78,12 @@ public class MeController {
         return ResponseEntity.ok(fotoUrl);
     }
 
+    /**
+     * Elimina la cuenta del usuario autenticado.
+     *
+     * @param authHeader Cabecera de autorización con el token JWT.
+     * @return Respuesta sin contenido si la operación fue exitosa.
+     */
     @DeleteMapping
     public ResponseEntity<Void> deleteMyAccount(@RequestHeader("Authorization") String authHeader) {
         UserResponseDto user = jwtUtil.extractUser(authHeader);
